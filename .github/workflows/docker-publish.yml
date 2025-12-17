@@ -1,5 +1,6 @@
 name: Deploy to GitHub Pages
 
+# Déclenche le workflow sur push sur main ou manuellement
 on:
   push:
     branches:
@@ -11,13 +12,22 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # 1️⃣ Récupérer le code du repo
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      # 2️⃣ (Optionnel) Installer Node si besoin pour un build
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      # 3️⃣ Déployer sur GitHub Pages
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
-          github_token: ${{ secrets.GH_TOKEN }}
-          publish_dir: ./       # assure-toi que index.html est ici
-          user_name: 'Colombe56'
-          user_email: 'colombe@example.com'
+          github_token: ${{ secrets.GITHUB_TOKEN }}   # token automatique fourni par GitHub
+          publish_dir: ./                             # dossier à publier (index.html doit être ici)
+          user_name: 'colombe56'                      # ton username GitHub
+          user_email: 'colombe@example.com'           # ton email GitHub
+          keep_files: false                            # supprime les anciens fichiers avant de publier
