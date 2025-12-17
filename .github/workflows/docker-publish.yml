@@ -1,15 +1,15 @@
-name: Build and Push Docker Image
+name: Publish Docker Image
 
 on:
   release:
-    types: [published]  # Déclenche à chaque nouvelle release
+    types: [created]   # se déclenche à chaque nouvelle release
 
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
+      - name: Checkout repo
         uses: actions/checkout@v4
 
       - name: Log in to Docker Hub
@@ -19,9 +19,7 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
 
       - name: Build Docker image
-        run: |
-          docker build -t colombe56/superweb-ci-cd:latest .
+        run: docker build -t colombe56/superweb-ci-cd:latest .
 
       - name: Push Docker image
-        run: |
-          docker push colombe56/superweb-ci-cd:latest
+        run: docker push colombe56/superweb-ci-cd:latest
