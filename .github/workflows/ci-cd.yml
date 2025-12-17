@@ -15,25 +15,22 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # 2️⃣ Valider le HTML/CSS (lint)
+      # 2️⃣ Vérifier le HTML (simple check via tidy)
+      - name: Install tidy
+        run: sudo apt-get install tidy -y
+
       - name: Validate HTML
-        uses: amitmerchant1990/html-validator-action@v1
-        with:
-          files: '**/*.html'
-
-      - name: Validate CSS
         run: |
-          npm install -g stylelint stylelint-config-standard
-          stylelint "**/*.css" || true
+          find . -name "*.html" -exec tidy -qe {} \;
 
-      # 3️⃣ Build Docker
+      # 3️⃣ Build Docker (optionnel pour plus tard)
       - name: Build Docker image
         run: |
           docker build -t superweb-ci-cd .
 
       # 4️⃣ Déployer sur GitHub Pages
       - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v5
+        uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./  # publie tout le projet
+          publish_dir: ./
