@@ -17,6 +17,6 @@ jobs:
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./       # Ton index.html doit être ici
+          publish_dir: ./         # ton index.html doit être à la racine
           user_name: 'colombe56'
           user_email: 'colombe@example.com'
