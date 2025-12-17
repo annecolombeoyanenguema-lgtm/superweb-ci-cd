@@ -4,23 +4,26 @@ on:
   push:
     branches:
       - main  # Déclenche le workflow à chaque push sur main
+  workflow_dispatch:  # Permet de déclencher manuellement si besoin
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-    - name: Set up Node.js (optionnel si tu as du build JS)
-      uses: actions/setup-node@v3
-      with:
-        node-version: '18'
+      - name: Setup Node.js (optionnel si tu builds ton site)
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
 
-    - name: Deploy to GitHub Pages
-      uses: peaceiris/actions-gh-pages@v3
-      with:
-        github_token: ${{ secrets.GH_PAT }}  # Ton token personnel
-        publish_dir: ./  # dossier à publier (./ pour ton index.html à la racine)
-        publish_branch: gh-pages
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}  # Token automatique
+          publish_dir: ./  # Répertoire à publier (index.html doit être ici)
+          publish_branch: gh-pages
+          user_name: 'Colombe56'  # Nom pour le commit
+          user_email: 'colombe@example.com'  # Email pour le commit
