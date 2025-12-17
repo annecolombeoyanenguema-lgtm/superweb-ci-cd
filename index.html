@@ -1,206 +1,421 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Portfolio & TD CI/CD</title>
-  <style>
-    body {
-      font-family: 'Arial', sans-serif;
-      background: linear-gradient(to right, #f0f8ff, #ffe4e1);
-      color: #333;
-      scroll-behavior: smooth;
-      margin: 0;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portfolio de Colombe</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #ff6f61;
+            --glass: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --text-dark: #2d3436;
+            --text-light: #ffffff;
+        }
 
-    header {
-      background: #fff;
-      padding: 20px 0;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-      position: sticky;
-      top: 0;
-      z-index: 100;
-    }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-    .menu {
-      list-style: none;
-      display: flex;
-      justify-content: center;
-      gap: 40px;
-    }
+        body {
+            font-family: 'Outfit', sans-serif;
+            overflow: hidden; /* Empêche le scroll natif */
+            color: var(--text-dark);
+        }
 
-    .menu li a {
-      text-decoration: none;
-      font-weight: bold;
-      color: #ff6f61;
-      padding: 10px 20px;
-      border-radius: 20px;
-      transition: all 0.3s;
-    }
+        /* Canvas pour la 3D en arrière-plan */
+        #canvas-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%); /* Fond clair premium */
+        }
 
-    .menu li a:hover {
-      background: #ff6f61;
-      color: #fff;
-    }
+        /* Navigation Glassmorphism */
+        nav {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            padding: 15px 30px;
+            border-radius: 50px;
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.1);
+            z-index: 100;
+            display: flex;
+            gap: 20px;
+        }
 
-    section {
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      text-align: center;
-      padding: 50px 20px;
-    }
+        nav a {
+            text-decoration: none;
+            color: #555;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            position: relative;
+            cursor: pointer;
+        }
 
-    h1 {
-      font-size: 2.5em;
-      margin-bottom: 20px;
-      color: #ff6f61;
-    }
+        nav a.active, nav a:hover {
+            color: var(--primary);
+        }
 
-    h2 {
-      color: #ff6f61;
-      margin-bottom: 20px;
-    }
+        nav a::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -5px;
+            left: 50%;
+            background: var(--primary);
+            transition: all 0.3s ease;
+            transform: translateX(-50%);
+        }
 
-    p {
-      font-size: 1.2em;
-      max-width: 700px;
-    }
+        nav a.active::after, nav a:hover::after {
+            width: 100%;
+        }
 
-    /* Boule 3D */
-    .scene {
-      perspective: 600px;
-      width: 150px;
-      height: 150px;
-      margin: 50px auto;
-    }
+        /* Sections de contenu */
+        main {
+            position: relative;
+            width: 100%;
+            height: 100vh;
+            pointer-events: none; /* Laisse passer les clics vers le canvas si besoin, réactivé sur les sections */
+        }
 
-    .cube {
-      width: 100%;
-      height: 100%;
-      background: radial-gradient(circle, #ff6f61, #ffa07a);
-      border-radius: 50%;
-      animation: rotate 15s linear infinite;
-      transform-style: preserve-3d;
-    }
+        section {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: flex-start; /* Alignement gauche pour laisser place à la 3D */
+            padding: 0 10%;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.5s ease, visibility 0.5s;
+            pointer-events: none; /* Désactivé quand caché */
+        }
 
-    @keyframes rotate {
-      0% { transform: rotateY(0deg) rotateX(0deg); }
-      100% { transform: rotateY(360deg) rotateX(360deg); }
-    }
+        section.active {
+            opacity: 1;
+            visibility: visible;
+            pointer-events: auto;
+        }
 
-    /* Table TD */
-    table {
-      width: 90%;
-      max-width: 900px;
-      border-collapse: collapse;
-      margin: 30px auto;
-      background: #fff;
-      border-radius: 10px;
-      overflow: hidden;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-    }
+        /* Typographie Premium */
+        h1 {
+            font-size: 4rem;
+            line-height: 1.1;
+            margin-bottom: 20px;
+            background: linear-gradient(45deg, #ff6f61, #d63031);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            max-width: 600px;
+        }
 
-    th, td {
-      border: 1px solid #ddd;
-      padding: 15px;
-      text-align: left;
-    }
+        p {
+            font-size: 1.2rem;
+            color: #636e72;
+            max-width: 500px;
+            line-height: 1.6;
+            margin-bottom: 30px;
+        }
 
-    th {
-      background: #ff6f61;
-      color: #fff;
-    }
+        .cta-button {
+            display: inline-block;
+            padding: 12px 30px;
+            background: var(--primary);
+            color: white;
+            border-radius: 30px;
+            text-decoration: none;
+            font-weight: bold;
+            box-shadow: 0 10px 20px rgba(255, 111, 97, 0.3);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
 
-    td ul {
-      padding-left: 20px;
-    }
+        .cta-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 25px rgba(255, 111, 97, 0.4);
+        }
 
-    td ul li {
-      margin-bottom: 5px;
-    }
+        /* Table TD Style - Glassmorphism */
+        .td-container {
+            background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.05);
+            max-height: 80vh;
+            overflow-y: auto;
+        }
 
-    @media (max-width: 600px) {
-      .menu {
-        flex-direction: column;
-        gap: 15px;
-      }
-    }
-  </style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+        }
+
+        th {
+            color: var(--primary);
+            font-weight: 700;
+            width: 150px;
+        }
+        
+        /* Mobile */
+        @media (max-width: 768px) {
+            h1 { font-size: 2.5rem; }
+            section { padding: 0 20px; align-items: center; text-align: center; } /* Centré sur mobile */
+            .td-container { width: 100%; padding: 15px; }
+            th, td { display: block; width: 100%; }
+        }
+    </style>
 </head>
 <body>
 
-  <!-- Menu -->
-  <header>
+    <!-- Container 3D -->
+    <div id="canvas-container"></div>
+
+    <!-- Navigation -->
     <nav>
-      <ul class="menu">
-        <li><a href="#home">Home</a></li>
-        <li><a href="#services">Services</a></li>
-        <li><a href="#contact">Contact</a></li>
-        <li><a href="#td">TD CI/CD</a></li>
-      </ul>
+        <a onclick="navigateTo('home')" class="active" id="btn-home">Home</a>
+        <a onclick="navigateTo('services')" id="btn-services">Services</a>
+        <a onclick="navigateTo('contact')" id="btn-contact">Contact</a>
+        <a onclick="navigateTo('td')" id="btn-td">TD CI/CD</a>
     </nav>
-  </header>
 
-  <!-- Home -->
-  <section id="home">
-    <h1> “Bienvenue 👋 sur le Portfolio de Colombe</h1>
-    <div class="scene">
-      <div class="cube"></div>
-    </div>
-    <p>Je crée des sites web modernes, colorés et interactifs, et je maîtrise les pipelines CI/CD.</p>
-  </section>
+    <!-- Sections -->
+    <main>
+        <!-- HOME -->
+        <section id="home" class="active">
+            <h1>Bienvenue sur le Portfolio de Colombe</h1>
+            <p>Découvrez une expérience web moderne et interactive. Je transforme vos idées en réalités numériques fluides et performantes.</p>
+            <a href="#" onclick="navigateTo('services')" class="cta-button">Mes Services</a>
+        </section>
 
-  <!-- Services -->
-  <section id="services">
-    <h2>Services</h2>
-    <p>Développement web, design UI/UX, intégration CI/CD, Dockerisation, et plus encore !</p>
-  </section>
+        <!-- SERVICES -->
+        <section id="services">
+            <h1>Expertise Technique</h1>
+            <p>Développement Web • UI/UX Design • CI/CD & DevOps</p>
+            <div class="td-container" style="background: rgba(255,255,255,0.4);">
+                <p><strong>Frontend:</strong> React, Three.js, HTML5/CSS3</p>
+                <p><strong>Backend:</strong> Node.js, Python</p>
+                <p><strong>DevOps:</strong> Docker, GitHub Actions, AWS</p>
+            </div>
+        </section>
 
-  <!-- Contact -->
-  <section id="contact">
-    <h2>Contact</h2>
-    <p>Email: colombe@example.com</p>
-    <p>Téléphone: +241 00 00 00 00</p>
-  </section>
+        <!-- CONTACT -->
+        <section id="contact">
+            <h1>Restons Connectés</h1>
+            <p>Un projet ? Une question ? N'hésitez pas à me contacter.</p>
+            <a href="mailto:colombe@example.com" class="cta-button">colombe@example.com</a>
+            <br><br>
+            <p>📍 Libreville, Gabon<br>📱 +241 00 00 00 00</p>
+        </section>
 
-  <!-- TD CI/CD -->
-  <section id="td">
-    <h2>TD : Mise en place d’un pipeline CI/CD</h2>
-    <table>
-      <tr>
-        <th>Objectif</th>
-        <td>
-          Mettre en œuvre les bases du DevOps en utilisant GitHub pour :
-          <ul>
-            <li>Versionner le code</li>
-            <li>Automatiser les tests</li>
-            <li>Construire et publier une image Docker</li>
-            <li>Déployer automatiquement une application</li>
-          </ul>
-        </td>
-      </tr>
-      <tr>
-        <th>Contexte</th>
-        <td>Petite équipe de développement, pipeline DevOps complet pour une application Web simple.</td>
-      </tr>
-      <tr>
-        <th>Tâches</th>
-        <td>
-          <ul>
-            <li>Initialiser le projet et dépôt GitHub (branches main/dev)</li>
-            <li>Mettre en place workflow CI (tests, build, logs)</li>
-            <li>Dockeriser et tester l'image</li>
-            <li>Publier l’image Docker via GitHub Actions</li>
-            <li>Déploiement automatique (GitHub Pages, VPS ou plateforme cloud)</li>
-            <li>Bonus : stratégie de branches, tests avancés, badges README</li>
-          </ul>
-        </td>
-      </tr>
-    </table>
-  </section>
+        <!-- TD CI/CD -->
+        <section id="td">
+            <div class="td-container">
+                <h2>TD : Pipeline CI/CD</h2>
+                <table>
+                    <tr>
+                        <th>Objectif</th>
+                        <td>Mettre en œuvre les bases du DevOps : Versioning, Tests, Docker, Déploiement auto.</td>
+                    </tr>
+                    <tr>
+                        <th>Contexte</th>
+                        <td>Pipeline DevOps complet pour une application Web avec GitHub Actions.</td>
+                    </tr>
+                    <tr>
+                        <th>Réalisé</th>
+                        <td>
+                            <ul>
+                                <li>✅ Dépôt GitHub configuré</li>
+                                <li>✅ Workflow CI (Build & Test)</li>
+                                <li>✅ Dockerisation de l'app</li>
+                                <li>✅ Déploiement GitHub Pages</li>
+                            </ul>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </section>
+    </main>
 
+    <!-- Scripts CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
+
+    <script>
+        // --- 1. SETUP THREE.JS SCENE ---
+        const container = document.getElementById('canvas-container');
+        const scene = new THREE.Scene();
+
+        // Caméra
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.z = 5;
+
+        // Rendu
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(window.devicePixelRatio);
+        container.appendChild(renderer.domElement);
+
+        // --- 2. OBJETS 3D (La "Boule") ---
+        // Création d'une sphère "Premium" avec MeshPhysicalMaterial
+        const geometry = new THREE.IcosahedronGeometry(2, 4); // Forme géométrique complexe
+        const material = new THREE.MeshPhysicalMaterial({
+            color: 0xff6f61, // Couleur primaire
+            roughness: 0.2, // Lisse
+            metalness: 0.1, // Un peu métallique
+            clearcoat: 1.0, // Vernis
+            clearcoatRoughness: 0.1,
+            wireframe: true // On peut désactiver le wireframe pour un look plein
+        });
+        
+        // Pour ajouter du volume, on met une sphère pleine à l'intérieur légèrement plus petite
+        const innerGeo = new THREE.IcosahedronGeometry(1.9, 4);
+        const innerMat = new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.1 });
+        const innerSphere = new THREE.Mesh(innerGeo, innerMat);
+
+        const sphere = new THREE.Mesh(geometry, material);
+        sphere.add(innerSphere);
+        scene.add(sphere);
+
+        // Position initiale de la sphère (à droite pour laisser le texte à gauche)
+        sphere.position.x = 2;
+
+        // --- 3. LUMIÈRES ---
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
+        scene.add(ambientLight);
+
+        const dirLight = new THREE.DirectionalLight(0xffffff, 1);
+        dirLight.position.set(5, 5, 5);
+        scene.add(dirLight);
+
+        const pointLight = new THREE.PointLight(0xff6f61, 2, 10);
+        pointLight.position.set(-2, 3, 4);
+        scene.add(pointLight);
+
+        // --- 4. ANIMATION LOOP ---
+        function animate() {
+            requestAnimationFrame(animate);
+
+            // Rotation douce constante
+            sphere.rotation.x += 0.001;
+            sphere.rotation.y += 0.002;
+
+            renderer.render(scene, camera);
+        }
+        animate();
+
+        // --- 5. RESPONSIVE ---
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            
+            // Ajustement mobile
+            if(window.innerWidth < 768) {
+                gsap.to(sphere.position, { duration: 1, x: 0, y: 1 });
+            } else {
+                // Remet à droite si on est sur la home
+                if(currentSection === 'home') gsap.to(sphere.position, { duration: 1, x: 2, y: 0 });
+            }
+        });
+
+        // --- 6. NAVIGATION & TRANSITIONS ---
+        let currentSection = 'home';
+
+        window.navigateTo = function(sectionId) {
+            if (currentSection === sectionId) return;
+
+            // 1. Mise à jour de la classe active du menu
+            document.querySelectorAll('nav a').forEach(el => el.classList.remove('active'));
+            document.getElementById('btn-' + sectionId).classList.add('active');
+
+            // 2. Transition des sections (DOM)
+            const oldSection = document.getElementById(currentSection);
+            const newSection = document.getElementById(sectionId);
+
+            // GSAP fade out old
+            gsap.to(oldSection, {
+                duration: 0.5,
+                opacity: 0,
+                onComplete: () => {
+                    oldSection.classList.remove('active');
+                }
+            });
+
+            // GSAP fade in new (avec un léger délai)
+            gsap.fromTo(newSection, 
+                { opacity: 0, y: 20 },
+                { duration: 0.5, opacity: 1, y: 0, delay: 0.3, onStart: () => {
+                    newSection.classList.add('active');
+                }}
+            );
+
+            // 3. Animation 3D en fonction de la section
+            moveSphereForSection(sectionId);
+            
+            currentSection = sectionId;
+        }
+
+        function moveSphereForSection(sectionId) {
+            // Définition des positions de la sphère pour chaque section
+            // GSAP permet d'animer position, rotation et couleur
+            
+            const isMobile = window.innerWidth < 768;
+
+            switch(sectionId) {
+                case 'home':
+                    // Sphère à droite
+                    gsap.to(sphere.position, { duration: 1.5, x: isMobile ? 0 : 2, y: isMobile ? 1 : 0, z: 0, ease: "power2.inOut" });
+                    gsap.to(sphere.material, { duration: 1, wireframe: true, color: 0xff6f61 });
+                    break;
+                case 'services':
+                    // Sphère à gauche ou centrée différemment
+                    gsap.to(sphere.position, { duration: 1.5, x: isMobile ? 0 : -2, y: 0, z: -1, ease: "power2.inOut" });
+                    // Changement de style visuel
+                    gsap.to(sphere.material, { duration: 1, wireframe: false, color: 0x74b9ff }); 
+                    break;
+                case 'contact':
+                    // Sphère en bas ou zoomée
+                    gsap.to(sphere.position, { duration: 1.5, x: 0, y: isMobile ? -2 : -1.5, z: 1, ease: "power2.inOut" });
+                    gsap.to(sphere.material, { duration: 1, wireframe: true, color: 0x55efc4 });
+                    break;
+                case 'td':
+                    // Sphère petite et en haut
+                    gsap.to(sphere.position, { duration: 1.5, x: isMobile ? 0 : 3, y: 2, z: -2, ease: "power2.inOut" });
+                    gsap.to(sphere.material, { duration: 1, wireframe: false, color: 0xa29bfe });
+                    break;
+            }
+        }
+
+        // Init responsive check
+        if(window.innerWidth < 768) {
+            sphere.position.set(0, 1, 0);
+        }
+
+    </script>
 </body>
 </html>
