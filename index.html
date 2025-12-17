@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Portfolio & TD CI/CD</title>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      background: linear-gradient(to right, #f0f8ff, #ffe4e1);
+      color: #333;
+      scroll-behavior: smooth;
+      margin: 0;
+    }
+
+    header {
+      background: #fff;
+      padding: 20px 0;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .menu {
+      list-style: none;
+      display: flex;
+      justify-content: center;
+      gap: 40px;
+    }
+
+    .menu li a {
+      text-decoration: none;
+      font-weight: bold;
+      color: #ff6f61;
+      padding: 10px 20px;
+      border-radius: 20px;
+      transition: all 0.3s;
+    }
+
+    .menu li a:hover {
+      background: #ff6f61;
+      color: #fff;
+    }
+
+    section {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 50px 20px;
+    }
+
+    h1 {
+      font-size: 2.5em;
+      margin-bottom: 20px;
+      color: #ff6f61;
+    }
+
+    h2 {
+      color: #ff6f61;
+      margin-bottom: 20px;
+    }
+
+    p {
+      font-size: 1.2em;
+      max-width: 700px;
+    }
+
+    /* Boule 3D */
+    .scene {
+      perspective: 600px;
+      width: 150px;
+      height: 150px;
+      margin: 50px auto;
+    }
+
+    .cube {
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(circle, #ff6f61, #ffa07a);
+      border-radius: 50%;
+      animation: rotate 15s linear infinite;
+      transform-style: preserve-3d;
+    }
+
+    @keyframes rotate {
+      0% { transform: rotateY(0deg) rotateX(0deg); }
+      100% { transform: rotateY(360deg) rotateX(360deg); }
+    }
+
+    /* Table TD */
+    table {
+      width: 90%;
+      max-width: 900px;
+      border-collapse: collapse;
+      margin: 30px auto;
+      background: #fff;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+
+    th, td {
+      border: 1px solid #ddd;
+      padding: 15px;
+      text-align: left;
+    }
+
+    th {
+      background: #ff6f61;
+      color: #fff;
+    }
+
+    td ul {
+      padding-left: 20px;
+    }
+
+    td ul li {
+      margin-bottom: 5px;
+    }
+
+    @media (max-width: 600px) {
+      .menu {
+        flex-direction: column;
+        gap: 15px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Menu -->
+  <header>
+    <nav>
+      <ul class="menu">
+        <li><a href="#home">Home</a></li>
+        <li><a href="#services">Services</a></li>
+        <li><a href="#contact">Contact</a></li>
+        <li><a href="#td">TD CI/CD</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <!-- Home -->
+  <section id="home">
+    <h1> “Bienvenue 👋 sur le Portfolio de Colombe</h1>
+    <div class="scene">
+      <div class="cube"></div>
+    </div>
+    <p>Je crée des sites web modernes, colorés et interactifs, et je maîtrise les pipelines CI/CD.</p>
+  </section>
+
+  <!-- Services -->
+  <section id="services">
+    <h2>Services</h2>
+    <p>Développement web, design UI/UX, intégration CI/CD, Dockerisation, et plus encore !</p>
+  </section>
+
+  <!-- Contact -->
+  <section id="contact">
+    <h2>Contact</h2>
+    <p>Email: colombe@example.com</p>
+    <p>Téléphone: +241 00 00 00 00</p>
+  </section>
+
+  <!-- TD CI/CD -->
+  <section id="td">
+    <h2>TD : Mise en place d’un pipeline CI/CD</h2>
+    <table>
+      <tr>
+        <th>Objectif</th>
+        <td>
+          Mettre en œuvre les bases du DevOps en utilisant GitHub pour :
+          <ul>
+            <li>Versionner le code</li>
+            <li>Automatiser les tests</li>
+            <li>Construire et publier une image Docker</li>
+            <li>Déployer automatiquement une application</li>
+          </ul>
+        </td>
+      </tr>
+      <tr>
+        <th>Contexte</th>
+        <td>Petite équipe de développement, pipeline DevOps complet pour une application Web simple.</td>
+      </tr>
+      <tr>
+        <th>Tâches</th>
+        <td>
+          <ul>
+            <li>Initialiser le projet et dépôt GitHub (branches main/dev)</li>
+            <li>Mettre en place workflow CI (tests, build, logs)</li>
+            <li>Dockeriser et tester l'image</li>
+            <li>Publier l’image Docker via GitHub Actions</li>
+            <li>Déploiement automatique (GitHub Pages, VPS ou plateforme cloud)</li>
+            <li>Bonus : stratégie de branches, tests avancés, badges README</li>
+          </ul>
+        </td>
+      </tr>
+    </table>
+  </section>
+
+</body>
+</html>
