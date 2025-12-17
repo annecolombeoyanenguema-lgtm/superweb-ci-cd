@@ -1,0 +1,39 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+      - dev
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1️⃣ Récupérer le code
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # 2️⃣ Valider le HTML/CSS (lint)
+      - name: Validate HTML
+        uses: amitmerchant1990/html-validator-action@v1
+        with:
+          files: '**/*.html'
+
+      - name: Validate CSS
+        run: |
+          npm install -g stylelint stylelint-config-standard
+          stylelint "**/*.css" || true
+
+      # 3️⃣ Build Docker
+      - name: Build Docker image
+        run: |
+          docker build -t superweb-ci-cd .
+
+      # 4️⃣ Déployer sur GitHub Pages
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v5
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./  # publie tout le projet
