@@ -1,8 +1,8 @@
-name: Publish Docker Image
+name: Build and Push Docker Image
 
 on:
   release:
-    types: [created]  # Se déclenche à chaque nouvelle release
+    types: [published]  # Déclenche à chaque nouvelle release
 
 jobs:
   build-and-push:
@@ -19,7 +19,9 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
 
       - name: Build Docker image
-        run: docker build -t colombe56/superweb-ci-cd:latest .
+        run: |
+          docker build -t colombe56/superweb-ci-cd:latest .
 
       - name: Push Docker image
-        run: docker push colombe56/superweb-ci-cd:latest
+        run: |
+          docker push colombe56/superweb-ci-cd:latest
