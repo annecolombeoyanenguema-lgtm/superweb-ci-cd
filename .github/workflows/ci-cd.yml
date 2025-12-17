@@ -1,45 +1,26 @@
-name: CI/CD Pipeline
+name: Deploy to GitHub Pages
 
 on:
   push:
     branches:
-      - main
-      - dev
+      - main  # Déclenche le workflow à chaque push sur main
 
 jobs:
-  build-and-test:
+  deploy:
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/main'
 
     steps:
-      # 1️⃣ Récupérer le code
-      - name: Checkout repository
-        uses: actions/checkout@v4
+    - name: Checkout repository
+      uses: actions/checkout@v4
 
-      # 2️⃣ Vérifier le HTML
-      - name: Install tidy
-        run: sudo apt-get update && sudo apt-get install tidy -y
+    - name: Set up Node.js (optionnel si tu as du build JS)
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
 
-      - name: Validate HTML
-        run: |
-          find . -name "*.html" -exec tidy -qe {} \;
-
-      # 3️⃣ Build Docker (optionnel)
-      - name: Build Docker image
-        run: docker build -t superweb-ci-cd .
-
-  deploy-pages:
-    runs-on: ubuntu-latest
-    needs: build-and-test
-    if: github.ref == 'refs/heads/main'
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v3
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./
-          force_orphan: true
+    - name: Deploy to GitHub Pages
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GH_PAT }}  # Ton token personnel
+        publish_dir: ./  # dossier à publier (./ pour ton index.html à la racine)
+        publish_branch: gh-pages
